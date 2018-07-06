@@ -22,7 +22,7 @@ def test_build_ising():
     temp = 1.0
     ising = Ising(L, temp) 
     a = np.ones((L, L))
-    ising.build_ising(rand = 0)
+    ising.build_ising(rand = False)
     b = ising.config
     assert(np.allclose(a, b))
 
@@ -31,9 +31,9 @@ def test_MC():
     temp = 2.0
     ising = Ising(L, temp) 
     #a = np.ones((L, L))
-    ising.build_ising(rand = 1)
+    ising.build_ising(rand = True)
     #b = ising.config
-    ising.MC_kernel()
+    ising.MC_kernel(DEBUG = False)
     #assert(np.allclose(a, b))
 
 if __name__ == '__main__':
