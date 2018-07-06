@@ -31,7 +31,8 @@ def test_build_ising():
     temp = 1.0
     ising = Ising(L, temp) 
     a = np.ones((L, L))
-    b = ising.build_ising(rand = 0)
+    ising.build_ising(rand = 0)
+    b = ising.config
     assert(np.allclose(a, b))
 
 

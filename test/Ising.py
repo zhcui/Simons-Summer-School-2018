@@ -19,16 +19,16 @@ from numpy import random as rd
 ### GLOBAL VARIABLE ###
 
 
-L = 10
-N = L * L
-temp = 1.5
-
-#pflip array
-pflip=np.zeros(9, dtype = np.double)
-index=[-4,-2,0,2,4]
-for i in index:
-    pflip[i] = np.exp(-i*2.0/temp)
-
+#L = 10
+#N = L * L
+#temp = 1.5
+#
+##pflip array
+#pflip=np.zeros(9, dtype = np.double)
+#index=[-4,-2,0,2,4]
+#for i in index:
+#    pflip[i] = np.exp(-i*2.0/temp)
+#
 
 class Ising(object):
     def __init__(self, length, temp): # TODO multi dim
@@ -42,6 +42,10 @@ class Ising(object):
             raise ValueError('Temperature should be greater than zero, should be larger than 1e-10',temp)
         for i in index:
             self.pflip[i] = np.exp(-i * 2.0 / temp)
+
+        self.energy = 0.0
+        self.mag = 0.0
+        self.config = None
 
     def build_ising(self, rand):
         """
@@ -64,13 +68,42 @@ class Ising(object):
             # some are 1, some are -1
             Is = rd.randint(-1, 1, size = (L, L)) # TODO: choose a more memory saving dtype
             Is[Is==0] = 1
-            return Is
         else:
             # all one case
             Is=rd.randint(1,2,size=(L,L))
-            return Is
+        self.config = Is
         
+    def _MC_step(self):
+            
+        e = self.energy
+        m = self.mag
+        A = self.config
+        L = self.length
 
+        for i in xrange(0, self.num_sites):
+            # randomly select a site
+            x=rd.randint(0,L)
+            y=rd.randint(0,L)
+           
+            # boundary PBC
+            xl = np.mod(x-1,L)
+            xr = np.mod(x+1,L)
+            yl = np.mod(y-1,L)
+            yr = np.mod(y+1,L)
+            # local interaction count
+            env_factor = A[x,y]*(A[xl,y]+A[xr,y]+A[x,yl]+A[x,yr])
+            p = self.pflip[env_factor]
+            r = rd.random()
+            # flip
+            if r<=p:
+                A[x,y] *= -1
+                e += env_factor * 2.0
+                m += A[x,y] * 2.0
+
+        self.energy = e
+        self.mag = m
+        self.config = A
+    
 
 
 
@@ -123,8 +156,8 @@ def MC_step(A,e,m):
 		else:
 			yl=y-1
 			yr=y+1
-		env_factor=A[x,y]*(A[xl,y]+A[xr,y]+A[x,yl]+A[x,yr])
-		p=pflip[env_factor]
+		env_factor = A[x,y] * (A[xl,y] + A[xr,y] + A[x,yl] + A[x,yr])
+		p = self.pflip[env_factor]
 		r=rd.random()
 		if r<=p:
 			A[x,y]=-A[x,y]
