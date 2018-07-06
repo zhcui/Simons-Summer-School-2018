@@ -15,12 +15,24 @@ from math import floor
 from numpy import linspace
 from numpy import random as rd
 
-from Ising import build_ising
+import pytest
+
+#from Ising import build_ising
+from Ising import Ising
+
+def test_init_ising_zero_temp():
+    L = 10
+    temp = 0.0
+    with pytest.raises(ValueError):
+        ising = Ising(L, temp) 
 
 def test_build_ising():
     L = 10
+    temp = 1.0
+    ising = Ising(L, temp) 
     a = np.ones((L, L))
-    b = build_ising(L, rand = 0)
+    b = ising.build_ising(rand = 0)
     assert(np.allclose(a, b))
+
 
 

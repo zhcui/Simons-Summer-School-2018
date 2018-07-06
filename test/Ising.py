@@ -30,6 +30,53 @@ for i in index:
     pflip[i] = np.exp(-i*2.0/temp)
 
 
+class Ising(object):
+    def __init__(self, length, temp): # TODO multi dim
+        self.length = length
+        self.num_sites = length * length
+        self.temp = temp
+        #pflip array
+        self.pflip = np.zeros(9, dtype = np.double)
+        index=[-4, -2, 0, 2, 4]
+        if temp <= 1e-10:
+            raise ValueError('Temperature should be greater than zero, should be larger than 1e-10',temp)
+        for i in index:
+            self.pflip[i] = np.exp(-i * 2.0 / temp)
+
+    def build_ising(self, rand):
+        """
+        Build the Ising model in a 2D array.
+
+        Parameters
+        ----------
+        rand : bool
+            whether randomly generate or not
+
+        Returns
+        -------
+        np.ndarray
+            The Ising model configurations.
+
+        """
+        L = self.length
+
+        if rand == 1:
+            # some are 1, some are -1
+            Is = rd.randint(-1, 1, size = (L, L)) # TODO: choose a more memory saving dtype
+            Is[Is==0] = 1
+            return Is
+        else:
+            # all one case
+            Is=rd.randint(1,2,size=(L,L))
+            return Is
+        
+
+
+
+
+
+
+
 ### FUNCTION ###
 
 def build_ising(L, rand):
