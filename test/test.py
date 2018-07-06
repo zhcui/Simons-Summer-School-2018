@@ -4,16 +4,7 @@ test file
 '''
 
 
-import os
 import numpy as np
-import scipy
-import string
-import math
-#import random as rd
-import cmath
-from math import floor
-from numpy import linspace
-from numpy import random as rd
 
 import pytest
 
@@ -34,6 +25,19 @@ def test_build_ising():
     ising.build_ising(rand = 0)
     b = ising.config
     assert(np.allclose(a, b))
+
+def test_MC():
+    L = 10
+    temp = 2.0
+    ising = Ising(L, temp) 
+    #a = np.ones((L, L))
+    ising.build_ising(rand = 1)
+    #b = ising.config
+    ising.MC_kernel()
+    #assert(np.allclose(a, b))
+
+if __name__ == '__main__':
+    test_MC()
 
 
 
