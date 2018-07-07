@@ -7,8 +7,9 @@ Author: Zhihao Cui
 """
 
 import numpy as np
-#import random as rd
+import random
 from numpy import random as rd
+import time
 
 
 class Ising(object):
@@ -72,14 +73,14 @@ class Ising(object):
         e = 0.0
         m = 0.0
 	for x in xrange(self.length):
+	    xl = x - 1
 	    for y in xrange(self.length):
-	        xl = x - 1
 		yl = y - 1
 		env_factor = A[x, y] * (A[xl, y] + A[x, yl])
 		e -= env_factor
 		m += A[x, y]
 	return e, m
-        
+    
     def _MC_step(self):
         """
         One MC step, update the configuration, energy and magnetization as well.
@@ -101,17 +102,19 @@ class Ising(object):
             # randomly select a site
             x = rd.randint(0, L)
             y = rd.randint(0, L)
+            #x = random.randint(0, L - 1)
+            #y = random.randint(0, L - 1)
             # boundary PBC
-            xl = np.mod(x - 1, L)
-            xr = np.mod(x + 1, L)
-            yl = np.mod(y - 1, L)
-            yr = np.mod(y + 1, L)
+            xl = x - 1
+            xr = (x + 1)%L
+            yl = y - 1
+            yr = (y + 1)%L
             # local interaction count
             env_factor = A[x, y] * (A[xl, y] + A[xr, y] + A[x, yl] + A[x, yr])
             p = self.pflip[env_factor]
             r = rd.random()
             # flip
-            if r<=p:
+            if r <= p:
                 A[x, y] *= -1
                 e += env_factor * 2.0
                 m += A[x, y] * 2.0
@@ -119,7 +122,7 @@ class Ising(object):
         self.energy = e
         self.mag = m
         self.config = A
-    
+
     def MC_kernel(self, init_steps = 5000, bin_steps = 100, mc_per_bin = 100, DEBUG = False):
         """
         Main MC procedure, measure <E>, <E^2>, <M>, <M^2> during the MC.
@@ -140,10 +143,14 @@ class Ising(object):
 
         """
 
-        print "\n2D Ising model with MC Algorithm\n"
+        time0 = time.time()
+        print "\n2D Ising model with MC algorithm\n"
         print "Parameters: length of lattice: %6d , temperature: %10.5f "%(self.length, self.temp)
         print "MC parameters: init_steps: %10d , bin_steps = %10d , mc_per_bin = %10d "\
             %(init_steps, bin_steps, mc_per_bin)
+
+        if self.config is None:
+            self.build_ising(rand = True)
 
         e = self.energy
         m = self.mag
@@ -196,10 +203,13 @@ class Ising(object):
         E2 /= float(bin_steps)
         M1 /= float(bin_steps)
         M2 /= float(bin_steps)
+        
+        time1 = time.time()
 
-        print "\nFinal Results: \n"
+        print "\nFinal results: \n"
         print "<E> : %12.6f , <E^2> : %10.5f , <M> : %12.6f , <M^2> : %10.5f "\
               %(E1, E2, M1, M2)
+        print "total time: %15.3f s"%(time1 - time0)
 
         
     

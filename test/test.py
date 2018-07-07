@@ -30,11 +30,7 @@ def test_MC():
     L = 10
     temp = 2.0
     ising = Ising(L, temp) 
-    #a = np.ones((L, L))
-    ising.build_ising(rand = True)
-    #b = ising.config
-    ising.MC_kernel(DEBUG = False)
-    #assert(np.allclose(a, b))
+    ising.MC_kernel(init_steps = 5000, bin_steps = 100, mc_per_bin = 100, DEBUG = False)
 
 if __name__ == '__main__':
     test_MC()
