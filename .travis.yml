@@ -4,4 +4,10 @@ python:
   - "2.7"
 script:
 
-  - python -m pytest ./test/test.py
+  - python -m pytest ./test/test*.py
+
+after_success:
+  - codecov
+
+notifications:
+  email: false
