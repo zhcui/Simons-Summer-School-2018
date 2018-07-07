@@ -14,13 +14,15 @@ import cmath
 from math import floor
 from numpy import linspace
 from numpy import random as rd
+import time
 
 ### GLOBAL VARIABLE ###
 
 
-L=10
+t0 = time.time()
+L=12
 N=L*L
-temp=1.5
+temp = 2.0
 
 #pflip array
 pflip=np.array([0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0])
@@ -42,7 +44,6 @@ def build_ising(rand):
 	else:
 		Is=rd.randint(1,2,size=(L,L))
 		return Is
-
 
 def MC_step(A,e,m):
 	for i in xrange(0,N):
@@ -87,58 +88,65 @@ def measure(A):
 ### MAIN ###
 
 	### variables ###
-A=build_ising(1)
-print A
+def main():
+    A=build_ising(1)
+    print A
 
-[e,m]=measure(A)
-
-
-
-initsteps=10000
-binstep=100
-MC_per_bin=100
-
-#pre eq
-
-for i in xrange(0,initsteps):
-	[e,m]=MC_step(A,e,m)
-
-
-#measure
-
-E1=0.0
-E2=0.0
-M1=0.0
-M2=0.0
-
-for i in xrange(0,binstep):
-	e1=0.0
-	e2=0.0
-	m1=0.0
-	m2=0.0
-	for j in xrange(0,MC_per_bin):
-		[e,m]=MC_step(A,e,m)
-		e1=e1+e
-		e2=e2+e**2
-		m1=m1+abs(m)
-		m2=m2+m**2
-	e1_ave=e1/(float(MC_per_bin)*float(N))
-	e2_ave=e2/(float(MC_per_bin)*float(N)**2)
-	m1_ave=m1/(float(MC_per_bin)*float(N))
-	m2_ave=m2/(float(MC_per_bin)*float(N)**2)
-	print [e1_ave,e2_ave,m1_ave,m2_ave]
-	print A
-	E1=E1+e1_ave
-	E2=E2+e2_ave
-	M1=M1+m1_ave
-	M2=M2+m2_ave
-	
-E1=E1/float(binstep)
-E2=E2/float(binstep)
-M1=M1/float(binstep)
-M2=M2/float(binstep)
-
-print [E1,E2,M1,M2]
+    [e,m]=measure(A)
 
 
 
+    initsteps=5000
+    binstep=100
+    MC_per_bin=100
+
+    #pre eq
+
+    for i in xrange(0,initsteps):
+            [e,m]=MC_step(A,e,m)
+
+
+    #measure
+
+    E1=0.0
+    E2=0.0
+    M1=0.0
+    M2=0.0
+
+    for i in xrange(0,binstep):
+            e1=0.0
+            e2=0.0
+            m1=0.0
+            m2=0.0
+            for j in xrange(0,MC_per_bin):
+                    [e,m]=MC_step(A,e,m)
+                    e1=e1+e
+                    e2=e2+e**2
+                    m1=m1+abs(m)
+                    m2=m2+m**2
+            e1_ave=e1/(float(MC_per_bin)*float(N))
+            e2_ave=e2/(float(MC_per_bin)*float(N)**2)
+            m1_ave=m1/(float(MC_per_bin)*float(N))
+            m2_ave=m2/(float(MC_per_bin)*float(N)**2)
+            print [e1_ave,e2_ave,m1_ave,m2_ave]
+            print A
+            E1=E1+e1_ave
+            E2=E2+e2_ave
+            M1=M1+m1_ave
+            M2=M2+m2_ave
+            
+    E1=E1/float(binstep)
+    E2=E2/float(binstep)
+    M1=M1/float(binstep)
+    M2=M2/float(binstep)
+
+    print [E1,E2,M1,M2]
+
+
+
+    t1 = time.time()
+    print t1-t0
+
+
+if __name__ == '__main__':
+    main()

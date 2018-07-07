@@ -79,7 +79,7 @@ class Ising(object):
                 e -= env_factor
                 m += self.config[x, y]
         return e, m
-  
+    
     def _MC_step(self):
         """
         One MC step, update the configuration, energy and magnetization as well.
