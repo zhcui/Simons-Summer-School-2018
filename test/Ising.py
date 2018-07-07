@@ -7,7 +7,7 @@ Author: Zhihao Cui
 """
 
 import numpy as np
-import random
+#import random
 from numpy import random as rd
 import time
 
@@ -71,15 +71,15 @@ class Ising(object):
         
         e = 0.0
         m = 0.0
-	for x in xrange(self.length):
-	    xl = x - 1
-	    for y in xrange(self.length):
-		yl = y - 1
-		env_factor = self.config[x, y] * (self.config[xl, y] + self.config[x, yl])
-		e -= env_factor
-		m += self.config[x, y]
-	return e, m
-   
+        for x in xrange(self.length):
+            xl = x - 1
+            for y in xrange(self.length):
+                yl = y - 1
+                env_factor = self.config[x, y] * (self.config[xl, y] + self.config[x, yl])
+                e -= env_factor
+                m += self.config[x, y]
+        return e, m
+  
     def _MC_step(self):
         """
         One MC step, update the configuration, energy and magnetization as well.
@@ -97,22 +97,12 @@ class Ising(object):
             # randomly select a site
             x = rd.randint(0, self.length)
             y = rd.randint(0, self.length)
-            #x = random.randint(0, L - 1)
-            #y = random.randint(0, L - 1)
             
-            # boundary PBC
-            #xl = x - 1
-            #xr = (x + 1)%L
-            #yl = y - 1
-            #yr = (y + 1)%L
-            
-            # local interaction count
+            # local interaction count, PBC is used
             env_factor = A[x, y] * (A[x - 1, y] + A[(x + 1)%self.length, y] + \
                          A[x, y - 1] + A[x, (y + 1)%self.length])
-            p = self.pflip[env_factor]
-            r = rd.random()
             # flip
-            if r <= p:
+            if rd.random() <= self.pflip[env_factor]:
                 A[x, y] *= -1
                 self.energy += env_factor * 2.0
                 self.mag += A[x, y] * 2.0
@@ -141,7 +131,7 @@ class Ising(object):
         print "\n2D Ising model with MC algorithm\n"
         print "Parameters: length of lattice: %6d , temperature: %10.5f "%(self.length, self.temp)
         print "MC parameters: init_steps: %10d , bin_steps = %10d , mc_per_bin = %10d "\
-            %(init_steps, bin_steps, mc_per_bin)
+               %(init_steps, bin_steps, mc_per_bin)
 
         if self.config is None:
             self.build_ising(rand = True)
@@ -200,7 +190,7 @@ class Ising(object):
 
         print "\nFinal results: \n"
         print "<E> : %12.6f , <E^2> : %10.5f , <M> : %12.6f , <M^2> : %10.5f "\
-              %(E1, E2, M1, M2)
+               %(E1, E2, M1, M2)
         print "total time: %15.3f s"%(time1 - time0)
 
         
