@@ -105,3 +105,6 @@ venv.bak/
 
 # pytest
 __pycache__
+
+#lineprofiler
+*.lprof

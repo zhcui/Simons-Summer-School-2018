@@ -3,12 +3,8 @@
 test file
 '''
 
-
 import numpy as np
-
 import pytest
-
-#from Ising import build_ising
 from Ising import Ising
 
 def test_init_ising_zero_temp():
@@ -27,7 +23,7 @@ def test_build_ising():
     assert(np.allclose(a, b))
 
 def test_MC():
-    L = 10
+    L = 8
     temp = 2.0
     ising = Ising(L, temp) 
     ising.MC_kernel(init_steps = 5000, bin_steps = 100, mc_per_bin = 100, DEBUG = False)

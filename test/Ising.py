@@ -47,12 +47,12 @@ class Ising(object):
 
         if rand:
             # some are 1, some are -1
-            Is = rd.randint(-1, 1, size = (self.length, self.length)) # TODO: choose a more memory saving dtype
-            Is[Is == 0] = 1
+            A = rd.randint(-1, 1, size = (self.length, self.length)) # TODO: choose a more memory saving dtype
+            A[A == 0] = 1
         else:
             # all one case
-            Is = rd.randint(1, 2, size = (self.length, self.length))
-        self.config = Is
+            A = rd.randint(1, 2, size = (self.length, self.length))
+        self.config = A
         self.energy, self.mag = self.measure()
 
     def measure(self):
@@ -79,7 +79,7 @@ class Ising(object):
 		e -= env_factor
 		m += self.config[x, y]
 	return e, m
-    
+   
     def _MC_step(self):
         """
         One MC step, update the configuration, energy and magnetization as well.
@@ -91,6 +91,7 @@ class Ising(object):
         -------
 
         """
+        A = self.config
             
         for i in xrange(self.num_sites):
             # randomly select a site
@@ -106,15 +107,15 @@ class Ising(object):
             #yr = (y + 1)%L
             
             # local interaction count
-            env_factor = self.config[x, y] * (self.config[x - 1, y] + self.config[(x + 1)%self.length, y] + \
-                         self.config[x, y - 1] + self.config[x, (y + 1)%self.length])
+            env_factor = A[x, y] * (A[x - 1, y] + A[(x + 1)%self.length, y] + \
+                         A[x, y - 1] + A[x, (y + 1)%self.length])
             p = self.pflip[env_factor]
             r = rd.random()
             # flip
             if r <= p:
-                self.config[x, y] *= -1
+                A[x, y] *= -1
                 self.energy += env_factor * 2.0
-                self.mag += self.config[x, y] * 2.0
+                self.mag += A[x, y] * 2.0
 
     def MC_kernel(self, init_steps = 5000, bin_steps = 100, mc_per_bin = 100, DEBUG = False):
         """
@@ -178,7 +179,7 @@ class Ising(object):
             m1_ave /= (float(mc_per_bin) * N)
             m2_ave /= (float(mc_per_bin) * N**2)
             
-            print "bin : %5d , <E> : %10.5f , <E^2> : %8.3f , <M> : %10.5f , <M^2> : %8.3f "\
+            print "  bin : %5d , <E> : %10.5f , <E^2> : %8.3f , <M> : %10.5f , <M^2> : %8.3f "\
                   %(i, e1_ave, e2_ave, m1_ave, m2_ave)
             if DEBUG:
                 print self.config
