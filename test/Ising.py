@@ -44,15 +44,14 @@ class Ising(object):
             The Ising model configurations.
 
         """
-        L = self.length
 
         if rand:
             # some are 1, some are -1
-            Is = rd.randint(-1, 1, size = (L, L)) # TODO: choose a more memory saving dtype
+            Is = rd.randint(-1, 1, size = (self.length, self.length)) # TODO: choose a more memory saving dtype
             Is[Is == 0] = 1
         else:
             # all one case
-            Is = rd.randint(1, 2, size = (L, L))
+            Is = rd.randint(1, 2, size = (self.length, self.length))
         self.config = Is
         self.energy, self.mag = self.measure()
 
@@ -69,16 +68,16 @@ class Ising(object):
             The energy and magnetization.
 
         """
-        A = self.config
+        
         e = 0.0
         m = 0.0
 	for x in xrange(self.length):
 	    xl = x - 1
 	    for y in xrange(self.length):
 		yl = y - 1
-		env_factor = A[x, y] * (A[xl, y] + A[x, yl])
+		env_factor = self.config[x, y] * (self.config[xl, y] + self.config[x, yl])
 		e -= env_factor
-		m += A[x, y]
+		m += self.config[x, y]
 	return e, m
     
     def _MC_step(self):
@@ -93,35 +92,29 @@ class Ising(object):
 
         """
             
-        e = self.energy
-        m = self.mag
-        A = self.config
-        L = self.length
-
         for i in xrange(self.num_sites):
             # randomly select a site
-            x = rd.randint(0, L)
-            y = rd.randint(0, L)
+            x = rd.randint(0, self.length)
+            y = rd.randint(0, self.length)
             #x = random.randint(0, L - 1)
             #y = random.randint(0, L - 1)
+            
             # boundary PBC
-            xl = x - 1
-            xr = (x + 1)%L
-            yl = y - 1
-            yr = (y + 1)%L
+            #xl = x - 1
+            #xr = (x + 1)%L
+            #yl = y - 1
+            #yr = (y + 1)%L
+            
             # local interaction count
-            env_factor = A[x, y] * (A[xl, y] + A[xr, y] + A[x, yl] + A[x, yr])
+            env_factor = self.config[x, y] * (self.config[x - 1, y] + self.config[(x + 1)%self.length, y] + \
+                         self.config[x, y - 1] + self.config[x, (y + 1)%self.length])
             p = self.pflip[env_factor]
             r = rd.random()
             # flip
             if r <= p:
-                A[x, y] *= -1
-                e += env_factor * 2.0
-                m += A[x, y] * 2.0
-
-        self.energy = e
-        self.mag = m
-        self.config = A
+                self.config[x, y] *= -1
+                self.energy += env_factor * 2.0
+                self.mag += self.config[x, y] * 2.0
 
     def MC_kernel(self, init_steps = 5000, bin_steps = 100, mc_per_bin = 100, DEBUG = False):
         """
@@ -152,8 +145,6 @@ class Ising(object):
         if self.config is None:
             self.build_ising(rand = True)
 
-        e = self.energy
-        m = self.mag
         N = self.num_sites
 
         #pre equilibrium 
