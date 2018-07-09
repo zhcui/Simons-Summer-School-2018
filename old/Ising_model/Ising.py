@@ -20,7 +20,7 @@ import time
 
 
 t0 = time.time()
-L=12
+L=8
 N=L*L
 temp = 2.0
 
